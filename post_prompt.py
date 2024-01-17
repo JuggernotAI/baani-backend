@@ -1,7 +1,7 @@
 import requests
 
 # Define the URL of your Flask app
-flask_app_url = 'http://127.0.0.1:5000'  # Update with the actual URL where your Flask app is running
+flask_app_url = 'https://baani-backend.onrender.com'  # Update with the actual URL where your Flask app is running
 
 # Define the prompt you want to send
 prompt = "Generate a creative response to this prompt."

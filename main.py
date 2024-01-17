@@ -54,7 +54,7 @@ def execute_function(function_name, tool_call):
     else:
         return f"function {function_name} not available for calling"
 
-def chatbot(message):
+def chatbot(message:str):
   # Create a list to store all the messages for context
     messages = [
     {"role": "system", "content": os.getenv("LLM_INSTRUCTIONS")},
@@ -72,7 +72,7 @@ def chatbot(message):
 
     # Add each new message to the list
     messages.append({"role": "user", "content": message})
-    pretty_print_conversation(messages=messages, message=None)
+    # pretty_print_conversation(messages=messages, message=None)
 
         # Request gpt-3.5-turbo for chat completion
     response = client.chat.completions.create(
