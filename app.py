@@ -137,26 +137,29 @@ def chatbot(message:str):
 #   chatbot()
 @app.route('/generate', methods=['POST'])
 def generate_response():
-    try:
-        # Get the prompt from the POST request
-        data = request.json
-        app.logger.info(f"{data}")
-        print(data)
-        prompt = data.get('prompt')
-        print(type(prompt))
-        if not prompt:
-            return jsonify({'error': 'Missing prompt parameter'}), 400
+    if request.method=='POST':
+        try:
+            # Get the prompt from the POST request
+            data = request.json
+            print(data)
 
-        # Call your GPT-4 API function to get the response
-        response = chatbot(prompt, prompt)
+            # app.logger.info(f"{data}")
+            # print(data)
+            prompt = data.get('prompt')
+            print(type(prompt))
+            if not prompt:
+                return jsonify({'error': 'Missing prompt parameter'}), 400
 
-        if response:
-            return jsonify({'response': response}), 200
-        else:
-            return jsonify({'error': 'Failed to generate response'}), 500
+            # Call your GPT-4 API function to get the response
+            response = chatbot(prompt)
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+            if response:
+                return jsonify({'response': response}), 200
+            else:
+                return jsonify({'error': 'Failed to generate response'}), 500
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
