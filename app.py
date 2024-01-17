@@ -16,8 +16,8 @@ def generate_response():
     try:
         # Get the prompt from the POST request
         data = request.json
-        prompt = data.get('prompt')
-
+        prompt = str(data.get('prompt'))
+        print(type(prompt))
         if not prompt:
             return jsonify({'error': 'Missing prompt parameter'}), 400
 
