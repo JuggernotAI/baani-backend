@@ -1,6 +1,15 @@
 from flask import Flask, request, jsonify
 from main import chatbot
+from flask import Flask, jsonify, request, session, redirect
+from flask_cors import CORS
 
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+app = Flask(__name__)
+CORS(app)
 app = Flask(__name__)
 
 # Replace with your GPT-4 API function
