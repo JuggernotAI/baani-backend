@@ -7,6 +7,8 @@ from function.dalle_executor import generate_image
 from function.linkedin_executor import make_post_linkedin
 from function.twitter_executor import make_post_twitter
 from interface.terminal import pretty_print_conversation
+from instructions.system_instructions import LLM_INSTRUCTIONS
+
 load_dotenv()
 client=openai
 
@@ -54,32 +56,22 @@ def execute_function(function_name, tool_call):
     else:
         return f"function {function_name} not available for calling"
 
-def chatbot(message:str):
+def chatbot(prompt):
   # Create a list to store all the messages for context
     messages = [
-    {"role": "system", "content": os.getenv("LLM_INSTRUCTIONS")},
+    {"role": "system", "content": LLM_INSTRUCTIONS},
   ]
-
-#   # Keep repeating the following
-#   while True:
-#     # Prompt user for input
-#     message = input("User: ")
-#     print("\n")
-
-#     # Exit program if user inputs "quit"
-#     if message.lower() == "quit":
-#       break
-
+    message = prompt
     # Add each new message to the list
     messages.append({"role": "user", "content": message})
-    # pretty_print_conversation(messages=messages, message=None)
+    pretty_print_conversation(messages=messages, message=None)
 
-        # Request gpt-3.5-turbo for chat completion
+    # Request gpt-3.5-turbo for chat completion
     response = client.chat.completions.create(
-        model="gpt-4-1106-preview",
-        messages=messages,
-        tools=tools,
-        tool_choice="auto"
+    model="gpt-4-1106-preview",
+    messages=messages,
+    tools=tools,
+    tool_choice="auto"
     )
 
     # Print the response and add it to the messages list
@@ -89,7 +81,7 @@ def chatbot(message:str):
 
     # # Step 2: check if the model wanted to call a function
     if tool_calls:
-        # only one function in this example, but you can have multiple
+    # only one function in this example, but you can have multiple
         messages.append(response_message)
         for tool_call in tool_calls:
             function_name = tool_call.function.name
@@ -114,12 +106,15 @@ def chatbot(message:str):
         messages.append({"role": "assistant", "content": chat_message})
         pretty_print_conversation(messages=messages, message=None)
         return messages
+        
     else:
         chat_message = response_message.content
         # print(f"Bot: {chat_message}")
         messages.append({"role": "assistant", "content": chat_message})
+        # print(messages)
         pretty_print_conversation(messages=messages, message=None)
         return messages
+
 # if __name__ == "__main__":
 #   pretty_print_conversation(messages=None, message="Start chatting with Baani. You can ask Baani to create content and image for Linkedin. \nBaani has the ability to post on your behalf as well( after you approval)  (type 'quit' to stop)!")
 #   chatbot()

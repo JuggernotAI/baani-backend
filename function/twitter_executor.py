@@ -34,7 +34,7 @@ def make_post_twitter(text, pic=None):
     # Get authorization
     base_authorization_url = "https://api.twitter.com/oauth/authorize"
     authorization_url = oauth.authorization_url(base_authorization_url)
-    pretty_print_conversation("Please go here and authorize: %s" % authorization_url)
+    pretty_print_conversation(messages=None, message="Please go here and authorize: %s" % authorization_url)
     verifier = input("Paste the PIN here: ")
 
     # Get the access token
@@ -70,7 +70,7 @@ def make_post_twitter(text, pic=None):
             "Request returned an error: {} {}".format(response.status_code, response.text)
         )
 
-    pretty_print_conversation("Response code: {}".format(response.status_code))
+    pretty_print_conversation(messages=None, message="Response code: {}".format(response.status_code))
 
     # Saving the response as JSON
     json_response = response.json()
