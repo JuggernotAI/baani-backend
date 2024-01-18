@@ -22,7 +22,7 @@ def make_post_linkedin(text, pic=None):
                 files = {"file": file}
                 response = requests.post(url, files=files, data=body, timeout=10000)
                 if response.status_code == 200:
-                    return "Post successful!"
+                    return "We have successfully posted the post on Linkedin!"
                 else:
                     return f"Failed to post. Status code: {response.status_code}"
     except Exception as e:

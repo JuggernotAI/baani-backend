@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import json
 from flask import Flask, request, jsonify
 from main import chatbot
+from function.linkedin_executor import make_post_linkedin
 from flask import Flask, jsonify, request, session, redirect
 from flask_cors import CORS
 load_dotenv()
@@ -42,6 +43,22 @@ def generate_response():
             else:
                 return jsonify({'error': 'Failed to generate response'}), 500
 
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+@app.route('/post_linkedin', methods=['POST'])
+def call_linkedin():
+    if request.method=='POST':
+        try:
+            data = request.json
+            content = data.get('content')
+            if not content:
+                return jsonify({'error': 'Missing content for posting on Linkedin'}), 400
+            response = make_post_linkedin(content)
+
+            if response:
+                return jsonify({'Response': response}), 200
+            else:
+                return jsonify({'error': 'Internal Server Error'}), 500
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
