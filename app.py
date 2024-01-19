@@ -4,15 +4,20 @@ from dotenv import load_dotenv
 from main import chatbot, init_chat
 from instructions.system_instructions import LLM_INSTRUCTIONS
 from function.linkedin_executor import make_post_linkedin
-# from function.twitter_executor import get_verifier, attach_verifier
+from function.twitter_executor import post_twitter
 from flask import Flask, jsonify, request, session, redirect, url_for, json
 from flask_cors import CORS
+from requests_oauthlib import OAuth1Session
 load_dotenv()
 client=openai
 
 app = Flask(__name__)
 CORS(app)
 
+app.secret_key = os.urandom(24)  # Generate a secret key for session management
+
+consumer_key = os.getenv("CONSUMER_KEY")
+consumer_secret = os.getenv("CONSUMER_SECRET")
 
 @app.route("/")
 def home():
@@ -31,25 +36,18 @@ def init_chat_call():
 def generate_response():
     if request.method=='POST':
         try:
-            # Get the prompt from the POST request
-            
             response = request.json
             messages = response.get("messages")
             print(messages)
-
-            
             # print(type(prompt))
             if not messages:
                 return jsonify({'error': 'Missing prompt parameter'}), 400
-
-            # Call your GPT-4 API function to get the response
             response = chatbot(messages)
 
             if response:
                 return jsonify({'response': response}), 200
             else:
                 return jsonify({'error': 'Failed to generate response'}), 500
-            return "Success!"
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 @app.route('/post_linkedin', methods=['POST'])
@@ -68,6 +66,58 @@ def call_linkedin():
                 return jsonify({'error': 'Internal Server Error'}), 500
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+@app.route('/init_twitter_auth', methods=['GET'])
+def init_twitter_auth():
+    # Get request token
+    request_token_url = "https://api.twitter.com/oauth/request_token?oauth_callback=oob&x_auth_access_type=write"
+    oauth = OAuth1Session(consumer_key, client_secret=consumer_secret)
+    fetch_response = oauth.fetch_request_token(request_token_url)
+    session['resource_owner_key'] = fetch_response.get('oauth_token')
+    session['resource_owner_secret'] = fetch_response.get('oauth_token_secret')
+
+    # Get authorization URL
+    base_authorization_url = "https://api.twitter.com/oauth/authorize"
+    authorization_url = oauth.authorization_url(base_authorization_url)
+    return jsonify({'authorization_url': authorization_url})
+
+@app.route('/complete_twitter_auth', methods=['POST'])
+def complete_twitter_auth():
+    verifier = request.json.get('verifier')
+    resource_owner_key = session.get('resource_owner_key')
+    resource_owner_secret = session.get('resource_owner_secret')
+
+    # Exchange verifier for access token
+    access_token_url = "https://api.twitter.com/oauth/access_token"
+    oauth = OAuth1Session(
+        consumer_key,
+        client_secret=consumer_secret,
+        resource_owner_key=resource_owner_key,
+        resource_owner_secret=resource_owner_secret,
+        verifier=verifier,
+    )
+    oauth_tokens = oauth.fetch_access_token(access_token_url)
+
+    # Store access tokens in session or database
+    session['access_token'] = oauth_tokens['oauth_token']
+    session['access_token_secret'] = oauth_tokens['oauth_token_secret']
+    return jsonify({'message': 'Authentication successful'})
+
+@app.route('/post_to_twitter', methods=['POST'])
+def post_to_twitter():
+    # Retrieve access tokens
+    access_token = session.get('access_token')
+    access_token_secret = session.get('access_token_secret')
+    if not access_token or not access_token_secret:
+        return jsonify({'error': 'Authentication required'}), 401
+
+    # Retrieve tweet text
+    tweet_text = request.json.get('text')
+    if not tweet_text:
+        return jsonify({'error': 'Tweet text is required'}), 400
+    post_details = post_twitter(tweet_text, access_token, access_token_secret)
+    # Post to Twitter
+    # ... (Your Twitter posting logic here) ...
+    # return appropriate response
 
 # @app.route('/twitter/authenticate')
 # def twitter_authenticate():

@@ -15,7 +15,7 @@ consumer_secret = os.getenv("CONSUMER_SECRET")
 # def get_verifier():
 #     # Be sure to add replace the text of the with the text you wish to Tweet. You can also add parameters to post polls, quote Tweets, Tweet with reply settings, and Tweet to Super Followers in addition to other features.
     
-
+# def init_verifier():
 #     # Get request token
 #     request_token_url = "https://api.twitter.com/oauth/request_token?oauth_callback=oob&x_auth_access_type=write"
 #     oauth = OAuth1Session(consumer_key, client_secret=consumer_secret)
@@ -55,52 +55,52 @@ consumer_secret = os.getenv("CONSUMER_SECRET")
 
     
 #     return access_token, access_token_secret
-# def call_twitter(text, access_token, access_token_secret, pic=None):
-#     # Make the request
-#     oauth = OAuth1Session(
-#         consumer_key,
-#         client_secret=consumer_secret,
-#         resource_owner_key=access_token,
-#         resource_owner_secret=access_token_secret,
-#     )
-#     payload = {"text": text}
-#     # Making the request
-#     response = oauth.post(
-#         "https://api.twitter.com/2/tweets",
-#         json=payload,
-#     )
+def post_twitter(text, access_token, access_token_secret, pic=None):
+    # Make the request
+    oauth = OAuth1Session(
+        consumer_key,
+        client_secret=consumer_secret,
+        resource_owner_key=access_token,
+        resource_owner_secret=access_token_secret,
+    )
+    payload = {"text": text}
+    # Making the request
+    response = oauth.post(
+        "https://api.twitter.com/2/tweets",
+        json=payload,
+    )
 
-#     if response.status_code != 201:
-#         raise Exception(
-#             "Request returned an error: {} {}".format(response.status_code, response.text)
-#         )
+    if response.status_code != 201:
+        raise Exception(
+            "Request returned an error: {} {}".format(response.status_code, response.text)
+        )
 
-#     pretty_print_conversation(messages=None, message="Response code: {}".format(response.status_code))
+    pretty_print_conversation(messages=None, message="Response code: {}".format(response.status_code))
 
-#     # Saving the response as JSON
-#     json_response = response.json()
-#     # print(json.dumps(json_response, indent=4, sort_keys=True))
+    # Saving the response as JSON
+    json_response = response.json()
+    # print(json.dumps(json_response, indent=4, sort_keys=True))
 
-def make_post_twitter(text, pic=None):
-    url = "https://replyrocket-backend.onrender.com/twitter/post"
-    data = {"text": text}
-    try:
-        if pic is not None:
-            with open(pic, "rb") as file:
-                files = {"image": file}
-                response = requests.post(url, files=files, data=data, timeout=10000)
-                if response.status_code == 200:
-                    return "Post successful!"
-                else:
-                    return f"Failed to post. Status code: {response.status_code}"
-        else:
-            response = requests.post(url, data=data, timeout=10000)
-            if response.status_code == 200:
-                return "Post successful!"
-            else:
-                return f"Failed to post. Status code: {response.status_code}"
-    except Exception as e:
-        return f"An error occurred: {str(e)}"
-if __name__=="__main__":
-    text="Test alert!"
-    print(make_post_twitter(text))
+# def make_post_twitter(text, pic=None):
+#     url = "https://replyrocket-backend.onrender.com/twitter/post"
+#     data = {"text": text}
+#     try:
+#         if pic is not None:
+#             with open(pic, "rb") as file:
+#                 files = {"image": file}
+#                 response = requests.post(url, files=files, data=data, timeout=10000)
+#                 if response.status_code == 200:
+#                     return "Post successful!"
+#                 else:
+#                     return f"Failed to post. Status code: {response.status_code}"
+#         else:
+#             response = requests.post(url, data=data, timeout=10000)
+#             if response.status_code == 200:
+#                 return "Post successful!"
+#             else:
+#                 return f"Failed to post. Status code: {response.status_code}"
+#     except Exception as e:
+#         return f"An error occurred: {str(e)}"
+# if __name__=="__main__":
+#     text="Test alert!"
+#     print(make_post_twitter(text))
