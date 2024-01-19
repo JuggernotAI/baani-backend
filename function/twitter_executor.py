@@ -81,26 +81,26 @@ def post_twitter(text, access_token, access_token_secret, pic=None):
     json_response = response.json()
     # print(json.dumps(json_response, indent=4, sort_keys=True))
 
-# def make_post_twitter(text, pic=None):
-#     url = "https://replyrocket-backend.onrender.com/twitter/post"
-#     data = {"text": text}
-#     try:
-#         if pic is not None:
-#             with open(pic, "rb") as file:
-#                 files = {"image": file}
-#                 response = requests.post(url, files=files, data=data, timeout=10000)
-#                 if response.status_code == 200:
-#                     return "Post successful!"
-#                 else:
-#                     return f"Failed to post. Status code: {response.status_code}"
-#         else:
-#             response = requests.post(url, data=data, timeout=10000)
-#             if response.status_code == 200:
-#                 return "Post successful!"
-#             else:
-#                 return f"Failed to post. Status code: {response.status_code}"
-#     except Exception as e:
-#         return f"An error occurred: {str(e)}"
+def make_post_twitter(text, pic=None):
+    url = "https://replyrocket-backend.onrender.com/twitter/post"
+    data = {"text": text}
+    try:
+        if pic is not None:
+            with open(pic, "rb") as file:
+                files = {"image": file}
+                response = requests.post(url, files=files, data=data, timeout=10000)
+                if response.status_code == 200:
+                    return "Post successful!"
+                else:
+                    return f"Failed to post. Status code: {response.status_code}"
+        else:
+            response = requests.post(url, data=data, timeout=10000)
+            if response.status_code == 200:
+                return "Post successful!"
+            else:
+                return f"Failed to post. Status code: {response.status_code}"
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
 # if __name__=="__main__":
 #     text="Test alert!"
 #     print(make_post_twitter(text))

@@ -66,7 +66,7 @@ def call_linkedin():
                 return jsonify({'error': 'Internal Server Error'}), 500
         except Exception as e:
             return jsonify({'error': str(e)}), 500
-@app.route('/init_twitter_auth', methods=['GET'])
+@app.route('/twitter/auth/init', methods=['GET'])
 def init_twitter_auth():
     # Get request token
     request_token_url = "https://api.twitter.com/oauth/request_token?oauth_callback=oob&x_auth_access_type=write"
@@ -80,7 +80,7 @@ def init_twitter_auth():
     authorization_url = oauth.authorization_url(base_authorization_url)
     return jsonify({'authorization_url': authorization_url})
 
-@app.route('/complete_twitter_auth', methods=['POST'])
+@app.route('/twitter/auth/verify', methods=['POST'])
 def complete_twitter_auth():
     verifier = request.json.get('verifier')
     resource_owner_key = session.get('resource_owner_key')
@@ -102,22 +102,27 @@ def complete_twitter_auth():
     session['access_token_secret'] = oauth_tokens['oauth_token_secret']
     return jsonify({'message': 'Authentication successful'})
 
-@app.route('/post_to_twitter', methods=['POST'])
+@app.route('/twitter/post', methods=['POST'])
 def post_to_twitter():
+    if request.method=='POST':
+        try:
     # Retrieve access tokens
-    access_token = session.get('access_token')
-    access_token_secret = session.get('access_token_secret')
-    if not access_token or not access_token_secret:
-        return jsonify({'error': 'Authentication required'}), 401
+            access_token = session.get('access_token')
+            access_token_secret = session.get('access_token_secret')
+            if not access_token or not access_token_secret:
+                return jsonify({'error': 'Authentication required'}), 401
 
-    # Retrieve tweet text
-    tweet_text = request.json.get('text')
-    if not tweet_text:
-        return jsonify({'error': 'Tweet text is required'}), 400
-    post_details = post_twitter(tweet_text, access_token, access_token_secret)
-    # Post to Twitter
-    # ... (Your Twitter posting logic here) ...
-    # return appropriate response
+            # Retrieve tweet text
+            tweet_text = request.json.get('text')
+            if not tweet_text:
+                return jsonify({'error': 'Tweet text is required'}), 400
+            response = post_twitter(tweet_text, access_token, access_token_secret)
+            if response:
+                return jsonify({'response': response}), 200
+            else:
+                return jsonify({'error': 'Failed to generate response'}), 500
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
 # @app.route('/twitter/authenticate')
 # def twitter_authenticate():
