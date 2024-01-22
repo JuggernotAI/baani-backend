@@ -8,6 +8,7 @@ from function.linkedin_executor import make_post_linkedin
 from function.twitter_executor import make_post_twitter
 from interface.terminal import pretty_print_conversation
 from instructions.system_instructions import LLM_INSTRUCTIONS
+from messages_demo import messages
 
 load_dotenv()
 client=openai
@@ -83,8 +84,9 @@ def chatbot(messages):
 
     # # Step 2: check if the model wanted to call a function
     if tool_calls:
-    # only one function in this example, but you can have multiple
-        messages.append(response_message)
+        # Initialise another array for tool content
+        tool_messages = messages
+        tool_messages.append(response_message)
         for tool_call in tool_calls:
             function_name = tool_call.function.name
             pretty_print_conversation(messages=None, message=f"Calling {function_name}")
@@ -99,7 +101,7 @@ def chatbot(messages):
             )  # extend conversation with function response
             second_response = client.chat.completions.create(
                 model="gpt-4-0613",
-                messages=messages,
+                messages=tool_messages,
             )
             final_response = second_response.choices[0].message.content
             # get a new response from the model where it can see the function response
@@ -107,6 +109,7 @@ def chatbot(messages):
         # print(f"Bot: {chat_message}")
         messages.append({"role": "assistant", "content": chat_message})
         pretty_print_conversation(messages=messages, message=None)
+        print("Message in main.py: ", messages)
         return messages
         
     else:
@@ -118,5 +121,6 @@ def chatbot(messages):
         return messages
 
 # if __name__ == "__main__":
+    messages.get("response")
 #   pretty_print_conversation(messages=None, message="Start chatting with Baani. You can ask Baani to create content and image for Linkedin. \nBaani has the ability to post on your behalf as well( after you approval)  (type 'quit' to stop)!")
 #   chatbot()

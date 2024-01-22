@@ -43,6 +43,7 @@ def generate_response():
             if not messages:
                 return jsonify({'error': 'Missing prompt parameter'}), 400
             response = chatbot(messages)
+            print(response)
 
             if response:
                 return jsonify({'response': response}), 200
@@ -111,7 +112,6 @@ def post_to_twitter():
             access_token_secret = session.get('access_token_secret')
             if not access_token or not access_token_secret:
                 return jsonify({'error': 'Authentication required'}), 401
-
             # Retrieve tweet text
             tweet_text = request.json.get('text')
             if not tweet_text:
