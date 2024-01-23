@@ -81,17 +81,16 @@ def chatbot(messages):
     # print(response)
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
-
     # # Step 2: check if the model wanted to call a function
     if tool_calls:
+        tool_messages = messages.copy()
         # Initialise another array for tool content
-        tool_messages = messages
         tool_messages.append(response_message)
         for tool_call in tool_calls:
             function_name = tool_call.function.name
             pretty_print_conversation(messages=None, message=f"Calling {function_name}")
             function_response = execute_function(function_name, tool_call)
-            messages.append(
+            tool_messages.append(
                 {
                     "tool_call_id": tool_call.id,
                     "role": "tool",
@@ -106,6 +105,7 @@ def chatbot(messages):
             final_response = second_response.choices[0].message.content
             # get a new response from the model where it can see the function response
         chat_message = final_response
+        # print(chat_message)
         # print(f"Bot: {chat_message}")
         messages.append({"role": "assistant", "content": chat_message})
         pretty_print_conversation(messages=messages, message=None)

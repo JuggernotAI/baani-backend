@@ -38,7 +38,7 @@ def generate_response():
         try:
             response = request.json
             messages = response.get("messages")
-            print(messages)
+            # print(messages)
             # print(type(prompt))
             if not messages:
                 return jsonify({'error': 'Missing prompt parameter'}), 400
