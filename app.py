@@ -8,13 +8,16 @@ from function.twitter_executor import post_twitter
 from flask import Flask, jsonify, request, session, redirect, url_for, json
 from flask_cors import CORS
 from requests_oauthlib import OAuth1Session
+from werkzeug.utils import secure_filename
+from image import verifier
 load_dotenv()
 client=openai
 
 app = Flask(__name__)
 CORS(app)
-
+TEMP = '/temp'
 app.secret_key = os.urandom(24)  # Generate a secret key for session management
+app.config['TEMP'] = TEMP
 
 consumer_key = os.getenv("CONSUMER_KEY")
 consumer_secret = os.getenv("CONSUMER_SECRET")
@@ -51,6 +54,29 @@ def generate_response():
                 return jsonify({'error': 'Failed to generate response'}), 500
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+
+@app.route('/upload/image', methods=['POST'])
+def upload_image():
+    file = request.files['image']
+    if not file:
+        return jsonify({'error': 'Image is required'}), 400
+    temp_dir = './temp'
+    filename = file.filename
+    file_path = os.path.join(temp_dir, filename)
+    file.save(file_path)
+    # file.save(tmp_file)
+    # if file and verifier.allowed_file(file.filename):
+    #     # os.makedirs(TEMP, exist_ok=True) # Create upload folder if it doesn't exist
+    #     filename = secure_filename(file.filename)
+    #     file_path = os.path.join(app.config['TEMP'], filename)
+    #     file.save(file_path)
+    return jsonify({'response': file_path}), 200
+    # else:
+    #     return jsonify({'error': 'Please provide a valid image'}), 500
+    
+    # url = gcs_upload_image(tmp_file) 
+    # os.remove(tmp_file)
+    
 @app.route('/post_linkedin', methods=['POST'])
 def call_linkedin():
     if request.method=='POST':
@@ -67,6 +93,37 @@ def call_linkedin():
                 return jsonify({'error': 'Internal Server Error'}), 500
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+@app.route('/linkedin/post/image', methods=['POST'])
+def call_linkedin():
+    pass
+    # file = request.files['image']
+    # if not file:
+    #     return jsonify({'error': 'Image is required'}), 400
+    # temp_dir = './temp'
+    # filename = file.filename
+    # file_path = os.path.join(temp_dir, filename)
+    # file.save(file_path)
+    # # file.save(tmp_file)
+    # # if file and verifier.allowed_file(file.filename):
+    # #     # os.makedirs(TEMP, exist_ok=True) # Create upload folder if it doesn't exist
+    # #     filename = secure_filename(file.filename)
+    # #     file_path = os.path.join(app.config['TEMP'], filename)
+    # #     file.save(file_path)
+    # return jsonify({'response': file_path}), 200
+    # if request.method=='POST':
+    #     try:
+    #         data = request.json
+    #         content = data.get('content')
+    #         if not content:
+    #             return jsonify({'error': 'Missing content for posting on Linkedin'}), 400
+    #         response = make_post_linkedin(content)
+
+    #         if response:
+    #             return jsonify({'Response': response}), 200
+    #         else:
+    #             return jsonify({'error': 'Internal Server Error'}), 500
+    #     except Exception as e:
+    #         return jsonify({'error': str(e)}), 500
 @app.route('/twitter/auth/init', methods=['GET'])
 def init_twitter_auth():
     # Get request token

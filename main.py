@@ -8,7 +8,7 @@ from function.linkedin_executor import make_post_linkedin
 from function.twitter_executor import make_post_twitter
 from interface.terminal import pretty_print_conversation
 from instructions.system_instructions import LLM_INSTRUCTIONS
-from messages_demo import messages
+# from messages_demo import messages
 
 load_dotenv()
 client=openai

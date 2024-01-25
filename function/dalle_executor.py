@@ -1,6 +1,7 @@
 import openai
 import os
 from dotenv import load_dotenv
+from image.dalle_handler import dalle_handler
 load_dotenv()
 client=openai
 
@@ -16,6 +17,8 @@ def generate_image(prompt, size="1024x1024"):
     )
     # path = os.path.join("./dalle", str(round(time.time() * 1000)) + ".png")
     image_url = response.data[0].url
+    response = dalle_handler(image_url)
+    print(response)
     # Image.open(requests.get(image_url, stream=True).raw).save(path)
     image_paths.append(image_url)
     print(image_url)
