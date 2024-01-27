@@ -2,7 +2,7 @@ import os
 import requests
 
 def dalle_handler(url=None):
-    file_path="./temp"
+    file_path="temp/"
     if url:
         response = requests.get(url)
         if response.status_code == 200:
