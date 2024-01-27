@@ -94,7 +94,7 @@ def call_linkedin():
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 @app.route('/linkedin/post/image', methods=['POST'])
-def call_linkedin():
+def call_linkedin_image():
     pass
     # file = request.files['image']
     # if not file:
