@@ -83,9 +83,13 @@ def call_linkedin():
         try:
             data = request.json
             content = data.get('content')
+            image = data.get('image')
             if not content:
                 return jsonify({'error': 'Missing content for posting on Linkedin'}), 400
-            response = make_post_linkedin(content)
+            if not image:
+                response = make_post_linkedin(content)
+            else:
+                response = make_post_linkedin(content, image)
 
             if response:
                 return jsonify({'Response': response}), 200
