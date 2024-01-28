@@ -1,5 +1,8 @@
 import requests
 import os
+from urllib.parse import urlparse
+from datetime import datetime
+temp_dir = "temp"
 
 def make_post_linkedin(text, pic=None):
     body = {
@@ -18,13 +21,31 @@ def make_post_linkedin(text, pic=None):
             else:
                 return f"Failed to post. Status code: {response.status_code}"
         else:
-            with open(pic, "rb") as file:
-                files = {"file": file}
-                response = requests.post(url, files=files, data=body, timeout=10000)
+            try:
+                response = requests.get(pic)
                 if response.status_code == 200:
-                    return "We have successfully posted the post on Linkedin!"
+                    
+                    image_name = os.path.basename(urlparse(pic).path)
+                    if not image_name:
+                        image_name = datetime.now().strftime("%Y%m%d%H%M%S") + ".jpg"
+                    
+                    file_path = os.path.join(temp_dir, image_name)
+
+                    with open(file_path, 'wb') as file:
+                        file.write(response.content)
+                    print(f"Image saved to {file_path}")
+
+                    with open(file_path, "rb") as file:
+                        files = {"file": file}
+                        response = requests.post(url, files=files, data=body, timeout=10000)
+                        if response.status_code == 200:
+                            return "We have successfully posted the post on Linkedin!"
+                        else:
+                            return f"Failed to post. Status code: {response.status_code}"
                 else:
-                    return f"Failed to post. Status code: {response.status_code}"
+                    print("Failed to download the image: Status code", response.status_code)
+            except requests.RequestException as e:
+                print("Error while downloading the image:", e)
     except Exception as e:
         return f"An error occurred: {str(e)}"
  
